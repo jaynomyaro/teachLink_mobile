@@ -14,10 +14,12 @@ interface AppState {
   accessToken: string | null;
   refreshToken: string | null;
   sessionExpiresAt: number | null;
+  sessionExpiringSoon: boolean;
   theme: "light" | "dark";
   setUser: (user: User | null) => void;
   setTheme: (theme: "light" | "dark") => void;
   setTokens: (accessToken: string, refreshToken: string, expiresAt: number) => void;
+  setSessionExpiringSoon: (isExpiringSoon: boolean) => void;
   logout: () => void;
 }
 
@@ -27,11 +29,13 @@ export const useAppStore = create<AppState>((set) => ({
   accessToken: null,
   refreshToken: null,
   sessionExpiresAt: null,
+  sessionExpiringSoon: false,
   theme: "light",
   setUser: (user) => set({ user, isAuthenticated: !!user }),
   setTheme: (theme) => set({ theme }),
   setTokens: (accessToken, refreshToken, sessionExpiresAt) =>
     set({ accessToken, refreshToken, sessionExpiresAt }),
+  setSessionExpiringSoon: (sessionExpiringSoon) => set({ sessionExpiringSoon }),
   logout: () =>
     set({
       user: null,
@@ -39,6 +43,7 @@ export const useAppStore = create<AppState>((set) => ({
       accessToken: null,
       refreshToken: null,
       sessionExpiresAt: null,
+      sessionExpiringSoon: false,
     }),
 }));
 
