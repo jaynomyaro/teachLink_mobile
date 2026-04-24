@@ -9,8 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Quiz, Course } from '../../../types/course';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../../navigation/types';
+import { QuizNavigationProp } from '../../../navigation/types';
 import { useQuizStore } from '../../../store/quizStore';
 import PrimaryButton from '../../common/PrimaryButton';
 import QuizCarousel from './QuizCarousel';
@@ -21,8 +20,10 @@ interface MobileQuizManagerProps {
   quiz: Quiz;
   courseId: string;
   onBack?: () => void;
-  navigation?: any; // For navigation to syllabus
-  course?: Course; // Course data for navigation
+  /** Optional React Navigation prop used to navigate back to CourseViewer after a passed quiz. */
+  navigation?: QuizNavigationProp;
+  /** Course data forwarded to the CourseViewer when navigating after quiz completion. */
+  course?: Course;
 }
 
 type QuizView = 'intro' | 'questions' | 'results';

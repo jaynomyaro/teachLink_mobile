@@ -14,8 +14,6 @@ export default function QuizScreen() {
       quiz={parsedQuiz}
       courseId={courseId as string}
       course={parsedCourse}
-      // Pass null for navigation since we're using expo-router
-      navigation={null as any}
       onBack={() => router.back()}
     />
   );

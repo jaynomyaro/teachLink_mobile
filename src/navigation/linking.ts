@@ -2,28 +2,7 @@ import { LinkingOptions } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
 import * as Notifications from 'expo-notifications';
 import { NotificationData, NotificationType } from '../types/notifications';
-
-// Define your navigation param list types
-export type RootStackParamList = {
-  // Main tabs
-  Home: undefined;
-  Courses: undefined;
-  Messages: undefined;
-  Learning: undefined;
-  Community: undefined;
-  Profile: undefined;
-  Achievements: undefined;
-
-  // Detail screens
-  CourseDetail: { courseId: string };
-  Chat: { conversationId: string };
-  AchievementDetail: { achievementId: string };
-  CommunityPost: { postId: string };
-
-  // Settings
-  Settings: undefined;
-  NotificationSettings: undefined;
-};
+import { RootStackParamList } from './types';
 
 const prefix = Linking.createURL('/');
 

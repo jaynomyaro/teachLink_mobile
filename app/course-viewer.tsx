@@ -17,8 +17,6 @@ export default function CourseViewerScreen() {
       initialLessonId={initialLessonId as string}
       initialViewMode={viewMode}
       onBack={() => router.back()}
-      // Pass null for navigation since we're using expo-router
-      navigation={null as any}
     />
   );
 }
