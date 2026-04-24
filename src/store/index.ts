@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { devtools, subscribeWithSelector } from "zustand/middleware";
 
 export interface User {
   id: string;
@@ -29,25 +30,9 @@ interface AppState {
   setError: (error: string | null) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  isAuthLoading: false,
-  authError: null,
-  accessToken: null,
-  refreshToken: null,
-  sessionExpiresAt: null,
-  theme: "light",
-  isLoading: false,
-  error: null,
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  setTheme: (theme) => set({ theme }),
-  setTokens: (accessToken, refreshToken, sessionExpiresAt) =>
-    set({ accessToken, refreshToken, sessionExpiresAt }),
-  setAuthLoading: (isAuthLoading) => set({ isAuthLoading }),
-  setAuthError: (authError) => set({ authError }),
-  logout: () =>
-    set({
+export const useAppStore = create<AppState>()(
+  devtools(
+    subscribeWithSelector((set) => ({
       user: null,
       isAuthenticated: false,
       isAuthLoading: false,
@@ -55,9 +40,34 @@ export const useAppStore = create<AppState>((set) => ({
       accessToken: null,
       refreshToken: null,
       sessionExpiresAt: null,
-    }),
-  setLoading: (isLoading) => set({ isLoading }),
-  setError: (error) => set({ error }),
-}));
+      theme: "light",
+      isLoading: false,
+      error: null,
+      setUser: (user) => set({ user, isAuthenticated: !!user }, false, "setUser"),
+      setTheme: (theme) => set({ theme }, false, "setTheme"),
+      setTokens: (accessToken, refreshToken, sessionExpiresAt) =>
+        set({ accessToken, refreshToken, sessionExpiresAt }, false, "setTokens"),
+      setAuthLoading: (isAuthLoading) => set({ isAuthLoading }, false, "setAuthLoading"),
+      setAuthError: (authError) => set({ authError }, false, "setAuthError"),
+      logout: () =>
+        set(
+          {
+            user: null,
+            isAuthenticated: false,
+            isAuthLoading: false,
+            authError: null,
+            accessToken: null,
+            refreshToken: null,
+            sessionExpiresAt: null,
+          },
+          false,
+          "logout"
+        ),
+      setLoading: (isLoading) => set({ isLoading }, false, "setLoading"),
+      setError: (error) => set({ error }, false, "setError"),
+    })),
+    { name: "AppStore" }
+  )
+);
 
-export * from './notificationStore';
+export * from "./notificationStore";
