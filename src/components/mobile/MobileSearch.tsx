@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { AppText as Text } from '../common/AppText';
+import { useDynamicFontSize } from '../../hooks/useDynamicFontSize';
 import { Search, SlidersHorizontal } from 'lucide-react-native';
 import { VoiceSearch } from './VoiceSearch';
 import { SearchHistory } from './SearchHistory';
@@ -74,8 +76,13 @@ function filterCourse(course: Course, query: string, filters: FilterValues): boo
   return true;
 }
 
+/**
+ * Props for the MobileSearch component
+ */
 export interface MobileSearchProps {
+  /** Callback when a search result is pressed */
   onResultPress?: (item: SearchResultItem) => void;
+  /** Placeholder text for the search input */
   placeholder?: string;
 }
 
@@ -89,6 +96,7 @@ export function MobileSearch({
   const [filterValues, setFilterValues] = useState<FilterValues>({});
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const { scale } = useDynamicFontSize();
 
   const suggestions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -162,9 +170,9 @@ export function MobileSearch({
     >
       <View style={styles.searchRow}>
         <View style={styles.inputWrap}>
-          <Search size={20} color="#9CA3AF" style={styles.searchIcon} />
+          <Search size={scale(20)} color="#9CA3AF" style={styles.searchIcon} />
           <TextInput
-            style={styles.input}
+            style={[styles.input, { fontSize: scale(16) }]}
             placeholder={placeholder}
             placeholderTextColor="#9CA3AF"
             value={query}
@@ -184,7 +192,7 @@ export function MobileSearch({
             onPress={() => setFilterSheetVisible(true)}
             style={[styles.filterBtn, Object.keys(filterValues).length > 0 && styles.filterBtnActive]}
           >
-            <SlidersHorizontal size={20} color={Object.keys(filterValues).length > 0 ? '#fff' : '#6B7280'} />
+            <SlidersHorizontal size={scale(20)} color={Object.keys(filterValues).length > 0 ? '#fff' : '#6B7280'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -204,7 +212,7 @@ export function MobileSearch({
               style={styles.suggestItem}
               onPress={() => handleSelectSuggestion(s)}
             >
-              <Search size={16} color="#9CA3AF" />
+              <Search size={scale(16)} color="#9CA3AF" />
               <Text style={styles.suggestText}>{s}</Text>
             </TouchableOpacity>
           ))}
