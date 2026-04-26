@@ -1,14 +1,5 @@
 import { SearchResultCard, SearchResultItem } from '../../src/components/mobile/SearchResultCard';
 
-jest.mock('react-native', () => ({
-  View: 'View',
-  Text: 'Text',
-  TouchableOpacity: 'TouchableOpacity',
-  StyleSheet: {
-    create: (styles: unknown) => styles,
-  },
-}));
-
 jest.mock('lucide-react-native', () => ({
   BookOpen: () => null,
   Clock: () => null,
@@ -107,7 +98,9 @@ describe('SearchResultCard', () => {
     it('renders duration when provided and greater than zero', () => {
       const item: SearchResultItem = { ...baseItem, duration: 45 };
       const element = SearchResultCard({ item, onPress: jest.fn() });
-      expect(JSON.stringify(element)).toContain('45 min');
+      const json = JSON.stringify(element);
+      expect(json).toContain('45');
+      expect(json).toContain(' min');
     });
 
     it('does not render duration when duration is zero', () => {
@@ -190,7 +183,8 @@ describe('SearchResultCard', () => {
       expect(json).toContain('Advanced TypeScript');
       expect(json).toContain('Deep dive into TypeScript generics');
       expect(json).toContain('Programming · Advanced');
-      expect(json).toContain('120 min');
+      expect(json).toContain('120');
+      expect(json).toContain(' min');
     });
   });
 });

@@ -1,15 +1,6 @@
+import React from 'react';
+import { render, RenderAPI } from '@testing-library/react-native';
 import { MobileFormInput } from '../../src/components/mobile/MobileFormInput';
-
-// Mock react-native primitives
-jest.mock('react-native', () => ({
-  View: 'View',
-  Text: 'Text',
-  TextInput: 'TextInput',
-  TouchableOpacity: 'TouchableOpacity',
-  StyleSheet: {
-    create: (styles: unknown) => styles,
-  },
-}));
 
 // Mock lucide icons used inside the component
 jest.mock('lucide-react-native', () => ({
@@ -17,6 +8,9 @@ jest.mock('lucide-react-native', () => ({
   EyeOff: () => null,
   AlertCircle: () => null,
 }));
+
+const renderComponent = (props: Record<string, unknown>): RenderAPI =>
+  render(<MobileFormInput {...props} />);
 
 describe('MobileFormInput', () => {
   const baseProps = {
@@ -64,49 +58,49 @@ describe('MobileFormInput', () => {
 
   describe('rendering', () => {
     it('renders without crashing with minimal props', () => {
-      const element = MobileFormInput(baseProps as any);
-      expect(element).toBeTruthy();
+      const { toJSON } = renderComponent(baseProps);
+      expect(toJSON()).toBeTruthy();
     });
 
     it('renders label text', () => {
-      const element = MobileFormInput({ ...baseProps, label: 'Password' } as any);
-      const json = JSON.stringify(element);
+      const { toJSON } = renderComponent({ ...baseProps, label: 'Password' });
+      const json = JSON.stringify(toJSON());
       expect(json).toContain('Password');
     });
 
     it('renders error message when error prop is provided', () => {
-      const element = MobileFormInput({
+      const { toJSON } = renderComponent({
         ...baseProps,
         error: 'This field is required',
-      } as any);
-      const json = JSON.stringify(element);
+      });
+      const json = JSON.stringify(toJSON());
       expect(json).toContain('This field is required');
     });
 
     it('renders hint text when hint prop is provided and no error', () => {
-      const element = MobileFormInput({
+      const { toJSON } = renderComponent({
         ...baseProps,
         hint: 'Min 8 characters',
-      } as any);
-      const json = JSON.stringify(element);
+      });
+      const json = JSON.stringify(toJSON());
       expect(json).toContain('Min 8 characters');
     });
 
     it('does not render hint when error is also present', () => {
-      const element = MobileFormInput({
+      const { toJSON } = renderComponent({
         ...baseProps,
         hint: 'Min 8 characters',
         error: 'Too short',
-      } as any);
-      const json = JSON.stringify(element);
+      });
+      const json = JSON.stringify(toJSON());
       // Error takes priority — hint should not appear
       expect(json).not.toContain('Min 8 characters');
       expect(json).toContain('Too short');
     });
 
     it('renders required asterisk when required=true', () => {
-      const element = MobileFormInput({ ...baseProps, required: true } as any);
-      const json = JSON.stringify(element);
+      const { toJSON } = renderComponent({ ...baseProps, required: true });
+      const json = JSON.stringify(toJSON());
       expect(json).toContain('*');
     });
   });
@@ -115,20 +109,21 @@ describe('MobileFormInput', () => {
 
   describe('password field', () => {
     it('renders toggle button for password fields', () => {
-      const element = MobileFormInput({
+      const { toJSON } = renderComponent({
         ...baseProps,
         label: 'Password',
         secureTextEntry: true,
-      } as any);
+      });
       // Component renders a TouchableOpacity for the eye icon toggle
-      expect(element).toBeTruthy();
+      expect(toJSON()).toBeTruthy();
     });
 
     it('does not render toggle button for non-password fields', () => {
-      const element = MobileFormInput({ ...baseProps } as any);
-      const json = JSON.stringify(element);
+      const { toJSON } = renderComponent({ ...baseProps });
+      const json = JSON.stringify(toJSON());
       // No eye icon toggle for regular inputs
-      expect(element).toBeTruthy();
+      expect(toJSON()).toBeTruthy();
+      // The EyeOff icon is mocked as null; check it doesn't appear
       expect(json).not.toContain('EyeOff');
     });
   });
@@ -137,13 +132,13 @@ describe('MobileFormInput', () => {
 
   describe('dark mode', () => {
     it('renders in dark mode without crashing', () => {
-      const element = MobileFormInput({ ...baseProps, isDark: true } as any);
-      expect(element).toBeTruthy();
+      const { toJSON } = renderComponent({ ...baseProps, isDark: true });
+      expect(toJSON()).toBeTruthy();
     });
 
     it('renders in light mode without crashing', () => {
-      const element = MobileFormInput({ ...baseProps, isDark: false } as any);
-      expect(element).toBeTruthy();
+      const { toJSON } = renderComponent({ ...baseProps, isDark: false });
+      expect(toJSON()).toBeTruthy();
     });
   });
 
@@ -151,18 +146,18 @@ describe('MobileFormInput', () => {
 
   describe('multiline', () => {
     it('renders multiline input without crashing', () => {
-      const element = MobileFormInput({ ...baseProps, multiline: true } as any);
-      expect(element).toBeTruthy();
+      const { toJSON } = renderComponent({ ...baseProps, multiline: true });
+      expect(toJSON()).toBeTruthy();
     });
   });
 
-  // ── onChangeText callback ────────────────────────────────────────────────
+  // ── onChangeText callback ─────────────────────────────────────────────────
 
   describe('onChangeText callback', () => {
     it('accepts an onChangeText handler', () => {
       const onChangeText = jest.fn();
-      const element = MobileFormInput({ ...baseProps, onChangeText } as any);
-      expect(element).toBeTruthy();
+      const { toJSON } = renderComponent({ ...baseProps, onChangeText });
+      expect(toJSON()).toBeTruthy();
     });
 
     it('onChangeText is callable', () => {

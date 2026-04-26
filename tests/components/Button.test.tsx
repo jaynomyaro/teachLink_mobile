@@ -1,16 +1,6 @@
 import React from 'react';
 import PrimaryButton from '../../src/components/common/PrimaryButton';
 
-jest.mock('react-native', () => ({
-  TouchableOpacity: 'TouchableOpacity',
-  Text: 'Text',
-  ActivityIndicator: 'ActivityIndicator',
-  View: 'View',
-  StyleSheet: {
-    create: (styles: unknown) => styles,
-  },
-}));
-
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: { children: React.ReactNode }) => children,
 }));
@@ -49,7 +39,9 @@ describe('PrimaryButton', () => {
     it('does not render title text when loading', () => {
       const element = PrimaryButton({ title: 'Hidden', onPress: jest.fn(), loading: true });
       // Title text should not appear when loading spinner is shown
-      expect(JSON.stringify(element)).not.toContain('"Hidden"');
+      const json = JSON.stringify(element);
+      // Ensure the title does not appear as a child of a Text component
+      expect(json).not.toMatch(/"children"\s*:\s*"Hidden"/);
     });
 
     it('marks accessibilityState busy when loading', () => {

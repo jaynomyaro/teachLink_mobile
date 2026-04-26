@@ -170,7 +170,7 @@ describe('pushNotifications service', () => {
     });
 
     it('should remove notification listener', () => {
-      const mockRemove = Notifications.removeNotificationSubscription as jest.Mock;
+      const mockRemove = (Notifications as any).removeNotificationSubscription as jest.Mock;
       const mockSubscription = { remove: jest.fn() } as unknown as Notifications.Subscription;
 
       removeNotificationListener(mockSubscription);

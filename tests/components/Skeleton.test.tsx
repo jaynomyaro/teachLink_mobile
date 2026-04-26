@@ -1,153 +1,119 @@
 import React from 'react';
+import { render, RenderAPI } from '@testing-library/react-native';
 import { Skeleton, SkeletonGroup } from '../../src/components/ui/Skeleton';
 
-// Mock react-native Animated and View
-jest.mock('react-native', () => {
-  const animatedValue = {
-    setValue: jest.fn(),
-    addListener: jest.fn(),
-    removeAllListeners: jest.fn(),
-    stopAnimation: jest.fn(),
-  };
-
-  return {
-    View: 'View',
-    Animated: {
-      View: 'Animated.View',
-      Value: jest.fn(() => animatedValue),
-      timing: jest.fn(() => ({ start: jest.fn() })),
-      sequence: jest.fn((animations) => ({ start: jest.fn() })),
-      loop: jest.fn((animation) => ({ start: jest.fn() })),
-    },
-    StyleSheet: {
-      create: (styles: unknown) => styles,
-    },
-    DimensionValue: {},
-  };
-});
-
 describe('Skeleton', () => {
+  const renderSkeleton = (props?: any): RenderAPI => render(<Skeleton {...props} />);
+
   // ── Props interface ──────────────────────────────────────────────────────
 
   describe('props interface', () => {
     it('renders without any props', () => {
-      const element = Skeleton({});
-      expect(element).toBeTruthy();
+      const { toJSON } = renderSkeleton();
+      const json = JSON.stringify(toJSON());
+      expect(json).toBeTruthy();
     });
 
-    it('accepts width prop', () => {
-      const props = { width: 200 };
-      expect(props.width).toBe(200);
+    it('accepts width and height as numbers', () => {
+      const { toJSON } = renderSkeleton({ width: 100, height: 50 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('100');
+      expect(json).toContain('50');
     });
 
-    it('accepts height prop', () => {
-      const props = { height: 20 };
-      expect(props.height).toBe(20);
+    it('accepts width and height as percentages', () => {
+      const { toJSON } = renderSkeleton({ width: '50%', height: '100%' });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('50%');
+      expect(json).toContain('100%');
     });
 
     it('accepts borderRadius prop', () => {
-      const props = { borderRadius: 4 };
-      expect(props.borderRadius).toBe(4);
+      const { toJSON } = renderSkeleton({ borderRadius: 20 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('20');
     });
 
-    it('accepts circle prop', () => {
-      const props = { circle: true };
-      expect(props.circle).toBe(true);
-    });
-
-    it('accepts percentage-based width', () => {
-      const props = { width: '100%' };
-      expect(props.width).toBe('100%');
+    it('accepts custom style prop', () => {
+      const { toJSON } = renderSkeleton({ style: { marginTop: 10 } });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('10');
     });
   });
 
-  // ── Rendering ────────────────────────────────────────────────────────────
+  // ── Circle variant ────────────────────────────────────────────────────────
+
+  describe('circle variant', () => {
+    it('renders as circle when circle=true', () => {
+      const { toJSON } = renderSkeleton({ circle: true, width: 40, height: 40 });
+      const json = JSON.stringify(toJSON());
+      // borderRadius should be half of height when circle
+      expect(json).toContain('20');
+    });
+
+    it('calculates circle borderRadius from height when height is number', () => {
+      const { toJSON } = renderSkeleton({ circle: true, height: 60 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('30');
+    });
+
+    it('uses large borderRadius fallback when height is not a number', () => {
+      const { toJSON } = renderSkeleton({ circle: true, height: '100%', width: '100%' });
+      const json = JSON.stringify(toJSON());
+      // fallback is 999
+      expect(json).toContain('999');
+    });
+  });
+
+  // ── Rendering ─────────────────────────────────────────────────────────────
 
   describe('rendering', () => {
+    it('renders as Animated.View', () => {
+      const { toJSON } = renderSkeleton();
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('Animated.View');
+    });
+
     it('renders with numeric width and height', () => {
-      const element = Skeleton({ width: 120, height: 16 });
-      expect(element).toBeTruthy();
-    });
-
-    it('renders as circle when circle=true', () => {
-      const element = Skeleton({ width: 48, height: 48, circle: true });
-      expect(element).toBeTruthy();
-    });
-
-    it('renders with default borderRadius when circle=false', () => {
-      const element = Skeleton({ width: 100, height: 20, circle: false });
-      expect(element).toBeTruthy();
-    });
-
-    it('renders with custom borderRadius', () => {
-      const element = Skeleton({ width: 100, height: 20, borderRadius: 4 });
-      expect(element).toBeTruthy();
+      const { toJSON } = renderSkeleton({ width: 120, height: 80 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('120');
+      expect(json).toContain('80');
     });
 
     it('renders with string percentage width', () => {
-      const element = Skeleton({ width: '80%', height: 14 });
-      expect(element).toBeTruthy();
+      const { toJSON } = renderSkeleton({ width: '75%', height: 50 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('75%');
+      expect(json).toContain('50');
+    });
+
+    it('renders with custom borderRadius', () => {
+      const { toJSON } = renderSkeleton({ borderRadius: 16 });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('16');
+    });
+
+    it('applies custom style overrides', () => {
+      const { toJSON } = renderSkeleton({ style: { backgroundColor: 'red' } });
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('red');
     });
   });
 
-  // ── Circle border radius logic ───────────────────────────────────────────
+  // ── SkeletonGroup ─────────────────────────────────────────────────────────
 
-  describe('circle border radius', () => {
-    it('uses height/2 as borderRadius when circle=true and height is a number', () => {
-      const height = 60;
-      const expectedRadius = height / 2;
-      expect(expectedRadius).toBe(30);
-    });
-
-    it('uses 999 as fallback borderRadius when circle=true and height is not a number', () => {
-      const fallbackRadius = 999;
-      expect(fallbackRadius).toBe(999);
-    });
-  });
-});
-
-describe('SkeletonGroup', () => {
-  // ── Rendering ────────────────────────────────────────────────────────────
-
-  describe('rendering', () => {
-    it('renders children', () => {
-      const element = SkeletonGroup({
-        children: React.createElement('View', null),
-      });
-      expect(element).toBeTruthy();
-    });
-
-    it('renders multiple children', () => {
-      const element = SkeletonGroup({
-        children: [
-          React.createElement(Skeleton, { key: '1', width: 100, height: 16 }),
-          React.createElement(Skeleton, { key: '2', width: 80, height: 16 }),
-        ],
-      });
-      expect(element).toBeTruthy();
-    });
-
-    it('accepts optional style prop', () => {
-      const style = { gap: 8 };
-      const element = SkeletonGroup({
-        children: React.createElement('View', null),
-        style,
-      });
-      expect(element).toBeTruthy();
-    });
-  });
-
-  // ── Props interface ──────────────────────────────────────────────────────
-
-  describe('props interface', () => {
-    it('requires children prop', () => {
-      const props = { children: React.createElement('View', null) };
-      expect(props.children).toBeDefined();
-    });
-
-    it('style prop is optional', () => {
-      const props = { children: React.createElement('View', null) };
-      expect(props).not.toHaveProperty('style');
+  describe('SkeletonGroup', () => {
+    it('renders children inside a View', () => {
+      const { toJSON } = render(
+        <SkeletonGroup>
+          <Skeleton />
+          <Skeleton />
+        </SkeletonGroup>
+      );
+      const json = JSON.stringify(toJSON());
+      expect(json).toContain('View');
+      expect(json).toContain('Animated.View');
     });
   });
 });
