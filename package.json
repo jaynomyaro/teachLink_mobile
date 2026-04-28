@@ -22,7 +22,9 @@
     "deploy:ios": "bash ./scripts/deploy-ios.sh",
     "deploy:both": "bash ./scripts/deploy-both.sh",
     "deploy:preview": "bash ./scripts/deploy-preview.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "audit": "npm audit --audit-level=high",
+    "depcheck": "depcheck"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -83,6 +85,7 @@
     "@types/react": "~19.1.0",
     "@types/react-native-dotenv": "^0.2.2",
     "babel-preset-expo": "^54.0.10",
+    "depcheck": "^1.4.7",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-plugin-import": "^2.32.0",
