@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Ensure minimum touch target for mobile devices (44px x 44px) */
+  .min-touch-target {
+    @apply min-w-[44px] min-h-[44px];
+  }
+
+  /* Focus indicator for accessible navigation */
+  .accessible-focus {
+    @apply border-2 border-primary-500 rounded-lg;
+  }
+
+  /* Visually hidden but accessible to screen readers */
+  .sr-only {
+    @apply absolute w-1 h-1 p-0 -m-1 overflow-hidden whitespace-nowrap border-0;
+  }
+}

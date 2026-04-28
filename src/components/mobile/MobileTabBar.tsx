@@ -4,6 +4,9 @@ import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeArea } from '../../hooks/useSafeArea';
 import { Home, Compass, PlusCircle, MessageCircle, User } from 'lucide-react-native';
 
+/**
+ * Custom bottom tab bar component for TeachLink mobile
+ */
 export const MobileTabBar = ({ state, descriptors, navigation }: BottomTabBarProps) => {
     const { bottom } = useSafeArea();
 
@@ -54,9 +57,11 @@ export const MobileTabBar = ({ state, descriptors, navigation }: BottomTabBarPro
                     return (
                         <TouchableOpacity
                             key={index}
+                            accessible={true}
+                            testID={`tab-${route.name.toLowerCase()}`}
                             accessibilityRole="button"
                             accessibilityState={isFocused ? { selected: true } : {}}
-                            accessibilityLabel={options.tabBarAccessibilityLabel}
+                            accessibilityLabel={options.tabBarAccessibilityLabel || 'Create new content'}
                             onPress={onPress}
                             onLongPress={onLongPress}
                             className="flex-1 items-center justify-center -mt-6"
@@ -71,9 +76,11 @@ export const MobileTabBar = ({ state, descriptors, navigation }: BottomTabBarPro
                 return (
                     <TouchableOpacity
                         key={index}
+                        accessible={true}
+                        testID={`tab-${route.name.toLowerCase()}`}
                         accessibilityRole="button"
                         accessibilityState={isFocused ? { selected: true } : {}}
-                        accessibilityLabel={options.tabBarAccessibilityLabel}
+                        accessibilityLabel={options.tabBarAccessibilityLabel || label.toString()}
                         onPress={onPress}
                         onLongPress={onLongPress}
                         className="flex-1 items-center justify-center pt-3 pb-1"
@@ -85,6 +92,7 @@ export const MobileTabBar = ({ state, descriptors, navigation }: BottomTabBarPro
                         </View>
                         <Text
                             className={`text-xs mt-1 ${isFocused ? 'text-indigo-600 font-medium' : 'text-gray-500'}`}
+                            importantForAccessibility="no-hide-descendants"
                         >
                             {label.toString()}
                         </Text>
