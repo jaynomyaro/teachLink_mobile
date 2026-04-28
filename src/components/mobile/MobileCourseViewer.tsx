@@ -10,18 +10,21 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AppText as Text } from "../common/AppText";
-import { useDynamicFontSize } from "../../hooks/useDynamicFontSize";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useCourseProgress } from "../../hooks/useCourseProgress";
-import { RootStackParamList } from "../../navigation/types";
-import { Course, Lesson, Note } from "../../types/course";
-import logger from "../../utils/logger";
-import { ErrorBoundary } from "../common/ErrorBoundary";
-import PrimaryButton from "../common/PrimaryButton";
+
 import BookmarkButton from "./BookmarkButton";
 import LessonCarousel from "./LessonCarousel";
 import MobileSyllabus from "./MobileSyllabus";
+import { useAnalytics } from "../../hooks/useAnalytics";
+import { useCourseProgress } from "../../hooks/useCourseProgress";
+import { useDynamicFontSize } from "../../hooks/useDynamicFontSize";
+import { RootStackParamList } from "../../navigation/types";
+import { Course, Lesson, Note } from "../../types/course";
+import logger from "../../utils/logger";
+import { AnalyticsEvent, ScreenName } from "../../utils/trackingEvents";
+import { AppText as Text } from "../common/AppText";
+import { ErrorBoundary } from "../common/ErrorBoundary";
+import PrimaryButton from "../common/PrimaryButton";
 
 /**
  * Props for the MobileCourseViewer component
@@ -49,6 +52,7 @@ export default function MobileCourseViewer({
   navigation,
 }: MobileCourseViewerProps) {
   const { scale } = useDynamicFontSize();
+  const { trackEvent, trackScreen } = useAnalytics();
   const [viewMode, setViewMode] = useState<ViewMode>(
     initialViewMode || "lesson",
   );
@@ -149,10 +153,26 @@ export default function MobileCourseViewer({
       logger.component("MobileCourseViewer", "Mounted", {
         courseId: course.id,
       });
+      trackScreen(ScreenName.COURSE_VIEWER, { courseId: course.id });
+      trackEvent(AnalyticsEvent.COURSE_STARTED, { courseId: course.id, courseTitle: course.title });
     } catch (error) {
       logger.error("Error in MobileCourseViewer:", error);
     }
   }, [course.id]);
+
+  // Track course completion
+  useEffect(() => {
+    if (progress) {
+      const overallProgress = calculateOverallProgress();
+      if (overallProgress >= 100) {
+        trackEvent(AnalyticsEvent.COURSE_COMPLETED, { 
+          courseId: course.id, 
+          courseTitle: course.title,
+          progress: overallProgress 
+        });
+      }
+    }
+  }, [progress, course.id, course.title, calculateOverallProgress, trackEvent]);
 
   const handleLessonChange = useCallback(
     async (lessonId: string, index: number) => {
